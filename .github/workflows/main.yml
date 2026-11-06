@@ -12,12 +12,10 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Install and Connect Tailscale
-        run: |
-          Set-ExecutionPolicy Bypass -Scope Process -Force
-          Invoke-WebRequest -Uri "https://pkgs.tailscale.com/stable/tailscale-setup-latest.msi" -OutFile "tailscale-setup.msi"
-          Start-Process -FilePath "msiexec.exe" -ArgumentList "/i tailscale-setup.msi /quiet /norestart" -Wait
-          & "C:\Program Files\Tailscale\tailscale.exe" up --authkey=tskey-auth-kHfXS3JAKZ11CNTRL-fjmcGuMX9eYLaPKvwTHEeYLPE12vbpckE --hostname=windows-rdp
+      - name: Install Tailscale
+        uses: tailscale/github-action@v2
+        with:
+          authkey: tskey-auth-kHfXS3JAKZ11CNTRL-fjmcGuMX9eYLaPKvwTHEeYLPE12vbpckE
 
       - name: Enable RDP
         run: |
