@@ -1,0 +1,32 @@
+name: Secure RDP Windows 11
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    timeout-minutes: 360
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Install Tailscale
+        run: |
+          powershell -Command "Invoke-WebRequest -Uri https://pkgs.tailscale.com/stable/tailscale-setup-amd64.msi -OutFile tailscale-setup.msi"
+          Start-Process msiexec.exe -ArgumentList '/i tailscale-setup.msi /quiet' -Wait
+
+      - name: Connect to Tailscale
+        run: |
+          & "C:\Program Files\Tailscale\tailscale.exe" up --authkey=tskey-auth-YOUR_KEY_HERE --hostname=windows-rdp
+
+      - name: Enable RDP
+        run: |
+          Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server' -Name "fDenyTSConnections" -Value 0
+          Enable-NetFirewallRule -DisplayGroup "Remote Desktop"
+          Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp' -Name "UserAuthentication" -Value 1
+
+      - name: Set Password
+        run: |
+          net user administrator mr.english2008
