@@ -1,4 +1,4 @@
- name: Secure RDP Windows 11
+name: Secure RDP Windows 11
 
 on:
   workflow_dispatch:
